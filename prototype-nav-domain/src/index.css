@@ -1,0 +1,55 @@
+@import "tailwindcss";
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* Prototype: greyscale so IA and flows read without color distraction */
+#root {
+  filter: grayscale(1);
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  background: #f3f5f7;
+}
+
+button,
+[role="button"] {
+  cursor: pointer;
+}
+
+/* Outer chrome approximates iPhone 17 Pro (Dynamic Island, narrow side bezels). */
+.iphone-frame {
+  position: relative;
+  width: 392px;
+  max-width: 100%;
+  padding: 12px 11px 22px;
+  border-radius: 44px;
+  background: linear-gradient(145deg, #2a3038 0%, #0c0e12 42%, #1a1e26 100%);
+  box-shadow:
+    0 24px 48px rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(255, 255, 255, 0.06) inset,
+    0 0 0 1px rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+}
+
+.iphone-dynamic-island {
+  width: 126px;
+  height: 37px;
+  border-radius: 999px;
+  background: #0a0a0c;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+}
+
+/* Home indicator (gesture bar) — iOS-style pill at bottom safe area */
+.iphone-home-indicator {
+  width: 134px;
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.28);
+}
