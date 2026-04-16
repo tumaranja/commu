@@ -39,6 +39,8 @@ function PhoneInstance({
   whiteTopChrome?: boolean;
 }) {
   const [sectionByTab, setSectionByTab] = useState<Record<MainTab, string | null>>(initialSections);
+  /** V1 My town hub: grid cards are multi-select toggles (not mutually exclusive) */
+  const [myTownSelectedSectionIds, setMyTownSelectedSectionIds] = useState<string[]>([]);
   const [fabOverlayId, setFabOverlayId] = useState<string | null>(null);
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -73,7 +75,12 @@ function PhoneInstance({
   ) : activeTab === "myTown" && myTownComponent ? (
     myTownComponent
   ) : (
-    <TabHub tab={activeTab} onSelectSection={(id) => setSectionByTab((p) => ({ ...p, [activeTab]: id }))} />
+    <TabHub
+      tab={activeTab}
+      onSelectSection={(id) => setSectionByTab((p) => ({ ...p, [activeTab]: id }))}
+      myTownSelectedSectionIds={myTownSelectedSectionIds}
+      onMyTownSelectedSectionIdsChange={setMyTownSelectedSectionIds}
+    />
   );
 
   return (

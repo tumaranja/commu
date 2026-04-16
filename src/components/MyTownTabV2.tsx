@@ -44,7 +44,7 @@ export function MyTownTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: MyT
               role="tab"
               aria-selected={i === activeIdx}
               onClick={() => setActiveIdx(i)}
-              className={`shrink-0 min-w-[7.5rem] rounded-2xl border px-4 py-6 text-center text-sm font-semibold transition-colors ${
+              className={`shrink-0 min-w-[7.5rem] rounded-2xl border px-4 py-3 text-center text-sm font-semibold transition-colors ${
                 i === activeIdx
                   ? "border-transparent bg-slate-800 text-white shadow-md"
                   : "border-slate-200 bg-white text-slate-600 shadow-sm hover:border-slate-300 hover:bg-slate-50"

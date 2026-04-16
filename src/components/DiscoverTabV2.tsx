@@ -1,8 +1,6 @@
 import { useState } from "react";
 import type { SectionDef } from "../navigation/appStructure";
 import { sectionsByTab } from "../navigation/appStructure";
-import { SegmentedSectionNav } from "./SegmentedSectionNav";
-
 const discoverSections = sectionsByTab.discover;
 
 function SearchBar() {
@@ -193,6 +191,15 @@ function CarouselRow({ section }: { section: SectionDef }) {
   );
 }
 
+type PostsTheme = "all" | "neighborhood-help" | "ngos" | "food-aid";
+
+const postsThemes: { id: PostsTheme; label: string }[] = [
+  { id: "all", label: "All" },
+  { id: "neighborhood-help", label: "Neighborhood help" },
+  { id: "ngos", label: "NGOs" },
+  { id: "food-aid", label: "Food aid" },
+];
+
 type PostsChip = "nearby" | "found-for-you" | "popular-finland";
 
 const postsChips: { id: PostsChip; label: string }[] = [
@@ -248,6 +255,7 @@ export function DiscoverTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: D
   const [mapExpanded, setMapExpanded] = useState(false);
   const [selectedPin, setSelectedPin] = useState<number | null>(null);
   const [postsChip, setPostsChip] = useState<PostsChip>("nearby");
+  const [postsTheme, setPostsTheme] = useState<PostsTheme>("all");
   const [storiesFilter, setStoriesFilter] = useState<"local" | "finland">("local");
 
   const active = discoverSections[activeIdx];
@@ -262,17 +270,36 @@ export function DiscoverTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: D
 
   return (
     <div className="flex h-full flex-col">
-      <SegmentedSectionNav
-        items={discoverSections}
-        activeIdx={activeIdx}
-        onSelect={(i) => {
-          setActiveIdx(i);
-          setPostsChip("nearby");
-          setStoriesFilter("local");
-          setSelectedPin(null);
-          setMapExpanded(false);
-        }}
-      />
+      <div className="shrink-0 px-3 pt-2 pb-1">
+        <div
+          className="flex gap-3 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:thin]"
+          role="tablist"
+          aria-label="Discover sections"
+        >
+          {discoverSections.map((s, i) => (
+            <button
+              key={s.id}
+              type="button"
+              role="tab"
+              aria-selected={i === activeIdx}
+              onClick={() => {
+                setActiveIdx(i);
+                setPostsChip("nearby");
+                setStoriesFilter("local");
+                setSelectedPin(null);
+                setMapExpanded(false);
+              }}
+              className={`shrink-0 min-w-[7.5rem] rounded-2xl border px-4 py-3 text-center text-sm font-semibold transition-colors ${
+                i === activeIdx
+                  ? "border-transparent bg-slate-800 text-white shadow-md"
+                  : "border-slate-200 bg-white text-slate-600 shadow-sm hover:border-slate-300 hover:bg-slate-50"
+              }`}
+            >
+              {s.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <div
         className={
@@ -290,6 +317,7 @@ export function DiscoverTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: D
         {isPosts && (
           <>
             <div className="shrink-0">
+              <FilterChips options={postsThemes} active={postsTheme} onSelect={setPostsTheme} />
               <FilterChips options={postsChips} active={postsChip} onSelect={setPostsChip} />
             </div>
 

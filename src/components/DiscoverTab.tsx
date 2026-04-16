@@ -1,8 +1,16 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SectionDef } from "../navigation/appStructure";
 import { sectionsByTab } from "../navigation/appStructure";
 
 const discoverSections = sectionsByTab.discover;
+
+type PostsTheme = "all" | "neighborhood-help" | "ngos" | "food-aid";
+const postsThemes = [
+  { id: "all", label: "All topics" },
+  { id: "neighborhood-help", label: "Neighborhood help" },
+  { id: "ngos", label: "NGOs" },
+  { id: "food-aid", label: "Food aid" },
+] as const;
 
 function SearchBar() {
   return (
@@ -242,9 +250,24 @@ export function DiscoverTab({ activeIdx: controlledIdx, onActiveIdxChange }: Dis
   const [mapExpanded, setMapExpanded] = useState(false);
   const [selectedPin, setSelectedPin] = useState<number | null>(null);
   const [storiesFilter, setStoriesFilter] = useState<"local" | "finland">("local");
+  const [postsTheme, setPostsTheme] = useState<PostsTheme>("all");
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const themeMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!themeMenuOpen) return;
+    const handleDown = (e: MouseEvent) => {
+      if (themeMenuRef.current && !themeMenuRef.current.contains(e.target as Node)) {
+        setThemeMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleDown);
+    return () => document.removeEventListener("mousedown", handleDown);
+  }, [themeMenuOpen]);
 
   const active = discoverSections[activeIdx];
   const isStories = active.id === "discover.stories";
+  const isPosts = active.id === "discover.posts";
   const children = active.children ?? [];
   const hasSearch = children.some((c) => c.id.includes("search"));
   const nearbyChild = children.find((c) => c.id === "discover.nearby");
@@ -277,6 +300,60 @@ export function DiscoverTab({ activeIdx: controlledIdx, onActiveIdxChange }: Dis
 
       <div className="relative min-h-0 flex-1 overflow-y-auto px-3 py-3">
         {hasSearch && <SearchBar />}
+
+        {isPosts && (
+          <div className="relative mb-3" ref={themeMenuRef}>
+            <button
+              type="button"
+              aria-expanded={themeMenuOpen}
+              aria-haspopup="listbox"
+              onClick={() => setThemeMenuOpen((o) => !o)}
+              className="flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2 text-sm font-semibold text-white shadow-sm"
+            >
+              <span>{postsThemes.find((t) => t.id === postsTheme)?.label}</span>
+              <svg
+                viewBox="0 0 20 20"
+                className={`h-4 w-4 shrink-0 text-white/90 transition-transform ${themeMenuOpen ? "rotate-180" : ""}`}
+                fill="currentColor"
+                aria-hidden
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </button>
+            {themeMenuOpen && (
+              <div
+                className="absolute top-full left-0 z-20 mt-1 w-56 rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+                role="listbox"
+                aria-label="Topic filter"
+              >
+                {postsThemes.map((t) => {
+                  const active = t.id === postsTheme;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      role="option"
+                      aria-selected={active}
+                      onClick={() => {
+                        setPostsTheme(t.id);
+                        setThemeMenuOpen(false);
+                      }}
+                      className={`flex w-full px-4 py-2.5 text-left text-sm font-semibold ${
+                        active ? "bg-slate-100 text-slate-900" : "text-slate-700 hover:bg-slate-50"
+                      }`}
+                    >
+                      {t.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {isStories && (
           <div className="mb-3 flex gap-2">
