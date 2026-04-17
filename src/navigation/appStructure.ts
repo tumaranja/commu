@@ -11,8 +11,8 @@ export type SectionDef = {
 
 export const mainTabs: { id: MainTab; label: string }[] = [
   { id: "home", label: "Home" },
-  { id: "chats", label: "Chats" },
   { id: "discover", label: "Discover" },
+  { id: "chats", label: "Chats" },
   { id: "myTown", label: "My town" },
 ];
 

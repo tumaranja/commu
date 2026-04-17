@@ -14,7 +14,7 @@ export function SegmentedSectionNav({
   return (
     <div className="flex min-w-0 shrink-0 justify-center px-3 py-1">
       <div
-        className="inline-flex max-w-full min-w-0 flex-nowrap items-stretch gap-0.5 overflow-x-auto overscroll-x-contain rounded-full bg-slate-200 p-1 [scrollbar-width:thin]"
+        className="scrollbar-none inline-flex max-w-full min-w-0 flex-nowrap items-stretch gap-0.5 overflow-x-auto overscroll-x-contain rounded-full bg-slate-200 p-1"
         role="tablist"
         aria-label="Sections"
       >

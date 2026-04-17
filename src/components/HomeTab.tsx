@@ -32,7 +32,7 @@ export function HomeTab({ activeIdx: controlledIdx, onActiveIdxChange }: HomeTab
         ))}
       </div>
 
-      <div className="flex-1 overflow-y-auto px-3 py-3">
+      <div className="scrollbar-none flex-1 overflow-y-auto px-3 py-3">
         <div className="space-y-3">
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <div key={n} className="rounded-2xl border border-slate-200 bg-white shadow-sm">

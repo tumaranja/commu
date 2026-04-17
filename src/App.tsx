@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AppShell } from "./components/AppShell";
 import { AvatarMenu } from "./components/AvatarMenu";
 import { CreateFab } from "./components/CreateFab";
 import { NotificationsPanel } from "./components/NotificationsPanel";
 import { SectionPlaceholder } from "./components/SectionPlaceholder";
 import { DiscoverTab } from "./components/DiscoverTab";
-import { DiscoverTabV2 } from "./components/DiscoverTabV2";
 import { HomeTab } from "./components/HomeTab";
 import { HomeTabV2 } from "./components/HomeTabV2";
 import { MyTownTabV2 } from "./components/MyTownTabV2";
+import { SearchScreenPanel } from "./components/SearchScreenPanel";
 import { TabHub } from "./components/TabHub";
 import type { MainTab } from "./navigation/appStructure";
 import { mainTabs } from "./navigation/appStructure";
@@ -27,7 +27,7 @@ function PhoneInstance({
   homeComponent,
   discoverComponent,
   myTownComponent,
-  whiteTopChrome,
+  discoverHeaderSearch,
 }: {
   activeTab: MainTab;
   onTabChange: (t: MainTab) => void;
@@ -35,8 +35,8 @@ function PhoneInstance({
   discoverComponent: ReactNode;
   /** V2-only: My town uses segmented top nav instead of the default hub list */
   myTownComponent?: ReactNode;
-  /** Left (V1) prototype: white status bar, header, and tab strip */
-  whiteTopChrome?: boolean;
+  /** Prototype B: search icon on Discover opens full-screen search */
+  discoverHeaderSearch?: boolean;
 }) {
   const [sectionByTab, setSectionByTab] = useState<Record<MainTab, string | null>>(initialSections);
   /** V1 My town hub: grid cards are multi-select toggles (not mutually exclusive) */
@@ -45,6 +45,15 @@ function PhoneInstance({
   const [avatarOpen, setAvatarOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [createMenuOpen, setCreateMenuOpen] = useState(false);
+  const [searchScreenOpen, setSearchScreenOpen] = useState(false);
+
+  // Shared `activeTab` across both preview phones: clear search when leaving Home/Discover.
+  useEffect(() => {
+    if (activeTab !== "discover" && activeTab !== "home") {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset overlay when tab changes (incl. other preview column)
+      setSearchScreenOpen(false);
+    }
+  }, [activeTab]);
 
   const openSection = sectionByTab[activeTab];
   const showFabPlaceholder = fabOverlayId !== null;
@@ -83,16 +92,49 @@ function PhoneInstance({
     />
   );
 
+  const closeSearchScreen = () => setSearchScreenOpen(false);
+
+  const headerSearchIcon =
+    discoverHeaderSearch && (activeTab === "home" || activeTab === "discover") ? (
+      <button
+        type="button"
+        onClick={() => {
+          setSearchScreenOpen(true);
+          setNotificationsOpen(false);
+          setAvatarOpen(false);
+          setCreateMenuOpen(false);
+        }}
+        className="flex h-full min-w-[2.25rem] shrink-0 items-center justify-center px-2 text-slate-700 transition-colors hover:bg-slate-50 active:bg-slate-100"
+        aria-label="Open search"
+      >
+        <svg viewBox="0 0 20 20" aria-hidden="true" className="h-5 w-5">
+          <path
+            fill="currentColor"
+            fillRule="evenodd"
+            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+    ) : undefined;
+
   return (
     <AppShell
       bare
-      whiteTopChrome={whiteTopChrome}
+      globalSearch={headerSearchIcon}
+      searchOverlay={
+        discoverHeaderSearch ? (
+          <SearchScreenPanel open={searchScreenOpen} onClose={closeSearchScreen} />
+        ) : undefined
+      }
       onAvatarClick={() => {
+        closeSearchScreen();
         setAvatarOpen(true);
         setNotificationsOpen(false);
         setCreateMenuOpen(false);
       }}
       onNotificationsClick={() => {
+        closeSearchScreen();
         setNotificationsOpen(true);
         setAvatarOpen(false);
         setCreateMenuOpen(false);
@@ -121,6 +163,7 @@ function PhoneInstance({
                   onTabChange(t.id);
                   setFabOverlayId(null);
                   setCreateMenuOpen(false);
+                  setSearchScreenOpen(false);
                 }}
                 className={`rounded-lg py-2 font-semibold ${active ? "text-slate-900" : "text-slate-500"}`}
               >
@@ -208,10 +251,10 @@ function App() {
   return (
     <div className="relative h-screen">
       <PreviewZoomControls zoom={previewZoom} onZoomChange={setPreviewZoom} />
-      <div className="flex h-full min-h-0 w-full items-start justify-center gap-6 overflow-x-auto overflow-y-auto p-4">
+      <div className="scrollbar-none flex h-full min-h-0 w-full items-start justify-center gap-6 overflow-x-auto overflow-y-auto p-4">
         <div className="flex h-full flex-col items-center">
           <span className="mb-2 shrink-0 text-xs font-bold uppercase tracking-widest text-slate-400">
-            V1 — Carousels
+            a
           </span>
           <div className="origin-top" style={{ transform: `scale(${previewZoom})` }}>
             <div className="origin-top" style={{ transform: `scale(${PHONE_SCALE})` }}>
@@ -222,23 +265,27 @@ function App() {
                   <DiscoverTab activeIdx={activeSection} onActiveIdxChange={setActiveSection} />
                 }
                 homeComponent={<HomeTab activeIdx={activeSection} onActiveIdxChange={setActiveSection} />}
-                whiteTopChrome
               />
             </div>
           </div>
         </div>
         <div className="flex h-full flex-col items-center">
           <span className="mb-2 shrink-0 text-xs font-bold uppercase tracking-widest text-slate-400">
-            V2 — Chips + Feed
+            b
           </span>
           <div className="origin-top" style={{ transform: `scale(${previewZoom})` }}>
             <div className="origin-top" style={{ transform: `scale(${PHONE_SCALE})` }}>
               <PhoneInstance
                 activeTab={activeTab}
                 onTabChange={setActiveTab}
+                discoverHeaderSearch
                 homeComponent={<HomeTabV2 activeIdx={activeSection} onActiveIdxChange={setActiveSection} />}
                 discoverComponent={
-                  <DiscoverTabV2 activeIdx={activeSection} onActiveIdxChange={setActiveSection} />
+                  <DiscoverTab
+                    activeIdx={activeSection}
+                    onActiveIdxChange={setActiveSection}
+                    hideInlineSearch
+                  />
                 }
                 myTownComponent={<MyTownTabV2 activeIdx={activeSection} onActiveIdxChange={setActiveSection} />}
               />

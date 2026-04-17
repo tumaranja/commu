@@ -7,7 +7,7 @@ type Props = {
 };
 
 const btnClass =
-  "w-full rounded-xl px-3 py-2.5 text-left text-sm text-slate-800 hover:bg-slate-50";
+  "w-full rounded-full px-3 py-2.5 text-left text-sm text-slate-800 hover:bg-slate-50";
 
 function EntryRow({
   entry,
@@ -41,7 +41,7 @@ export function AvatarMenu({ open, onClose }: Props) {
     <div className="absolute inset-0 z-40 flex flex-col bg-slate-900/40" role="presentation">
       <button type="button" aria-label="Close menu" className="min-h-0 flex-1" onClick={onClose} />
       <div
-        className="max-h-[85%] overflow-y-auto rounded-t-2xl bg-white shadow-xl"
+        className="scrollbar-none max-h-[85%] overflow-y-auto rounded-t-2xl bg-white shadow-xl"
         role="dialog"
         aria-modal="true"
         aria-labelledby="avatar-menu-title"
@@ -50,7 +50,7 @@ export function AvatarMenu({ open, onClose }: Props) {
           <h2 id="avatar-menu-title" className="text-base font-bold text-slate-900">
             Menu
           </h2>
-          <button type="button" onClick={onClose} className="rounded-lg px-2 py-1 text-sm font-semibold text-emerald-700">
+          <button type="button" onClick={onClose} className="rounded-full px-2 py-1 text-sm font-semibold text-emerald-700">
             Done
           </button>
         </div>

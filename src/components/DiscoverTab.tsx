@@ -14,7 +14,7 @@ const postsThemes = [
 
 function SearchBar() {
   return (
-    <div className="mb-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
+    <div className="mb-4 flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
       <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-slate-400" fill="currentColor">
         <path
           fillRule="evenodd"
@@ -104,7 +104,7 @@ function ExpandButton({ expanded, onToggle }: { expanded: boolean; onToggle: () 
   return (
     <button
       type="button"
-      className="absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-lg bg-white/80 text-slate-600 shadow backdrop-blur-sm"
+      className="absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/80 text-slate-600 shadow backdrop-blur-sm"
       onClick={(e) => {
         e.stopPropagation();
         onToggle();
@@ -200,7 +200,7 @@ function NearbyMapRow({
 
 function NewsFeedRow({ count = 6 }: { count?: number }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {Array.from({ length: count }, (_, i) => i + 1).map((n) => (
         <div
           key={n}
@@ -224,7 +224,7 @@ function CarouselRow({ section }: { section: SectionDef }) {
       <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
         {section.label}
       </h3>
-      <div className="flex gap-3 overflow-x-auto pb-1">
+      <div className="scrollbar-none flex gap-2.5 overflow-x-auto pb-1">
         {[1, 2, 3, 4].map((n) => (
           <div
             key={n}
@@ -241,9 +241,15 @@ function CarouselRow({ section }: { section: SectionDef }) {
 type DiscoverTabProps = {
   activeIdx?: number;
   onActiveIdxChange?: (i: number) => void;
+  /** Prototype B: inline section SearchBar is hidden when header search is used */
+  hideInlineSearch?: boolean;
 };
 
-export function DiscoverTab({ activeIdx: controlledIdx, onActiveIdxChange }: DiscoverTabProps = {}) {
+export function DiscoverTab({
+  activeIdx: controlledIdx,
+  onActiveIdxChange,
+  hideInlineSearch = false,
+}: DiscoverTabProps = {}) {
   const [localIdx, setLocalIdx] = useState(0);
   const activeIdx = controlledIdx ?? localIdx;
   const setActiveIdx = onActiveIdxChange ?? setLocalIdx;
@@ -278,28 +284,36 @@ export function DiscoverTab({ activeIdx: controlledIdx, onActiveIdxChange }: Dis
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex shrink-0 gap-1 border-b border-slate-200 bg-white px-3 pt-1">
-        {discoverSections.map((section, i) => (
-          <button
-            key={section.id}
-            type="button"
-            onClick={() => {
-              setActiveIdx(i);
-              setStoriesFilter("local");
-            }}
-            className={`rounded-t-lg px-3 py-1 text-sm font-semibold ${
-              i === activeIdx
-                ? "border-b-2 border-slate-800 text-slate-900"
-                : "text-slate-500"
-            }`}
-          >
-            {section.label}
-          </button>
-        ))}
+      <div className="shrink-0 px-3 pt-0 pb-0">
+        <div
+          className="scrollbar-none -mx-3 flex gap-2.5 overflow-x-auto overscroll-x-contain px-3 pt-1 pb-2"
+          role="tablist"
+          aria-label="Discover sections"
+        >
+          {discoverSections.map((section, i) => (
+            <button
+              key={section.id}
+              type="button"
+              role="tab"
+              aria-selected={i === activeIdx}
+              onClick={() => {
+                setActiveIdx(i);
+                setStoriesFilter("local");
+              }}
+              className={`shrink-0 min-w-[7.5rem] rounded-full border px-4 py-3 text-center text-sm font-semibold transition-colors ${
+                i === activeIdx
+                  ? "border-transparent bg-slate-800 text-white shadow-md"
+                  : "border-slate-200 bg-white text-slate-600 shadow-sm hover:border-slate-300 hover:bg-slate-50"
+              }`}
+            >
+              {section.label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="relative min-h-0 flex-1 overflow-y-auto px-3 py-3">
-        {hasSearch && <SearchBar />}
+      <div className="scrollbar-none relative min-h-0 flex-1 overflow-y-auto px-3 pt-2.5 pb-3">
+        {hasSearch && !hideInlineSearch && <SearchBar />}
 
         {isPosts && (
           <div className="relative mb-3" ref={themeMenuRef}>
@@ -326,7 +340,7 @@ export function DiscoverTab({ activeIdx: controlledIdx, onActiveIdxChange }: Dis
             </button>
             {themeMenuOpen && (
               <div
-                className="absolute top-full left-0 z-20 mt-1 w-56 rounded-xl border border-slate-200 bg-white py-1 shadow-lg"
+                className="absolute top-full left-0 z-20 mt-1 w-56 rounded-full border border-slate-200 bg-white py-1 shadow-lg"
                 role="listbox"
                 aria-label="Topic filter"
               >

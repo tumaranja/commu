@@ -16,7 +16,7 @@ export function CreateFab({ menuOpen, onToggleMenu, onPickAction }: Props) {
               key={a.id}
               type="button"
               onClick={() => onPickAction(a.id)}
-              className="rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-slate-50"
+              className="rounded-full px-3 py-2.5 text-left text-sm font-semibold text-slate-800 hover:bg-slate-50"
             >
               {a.label}
             </button>

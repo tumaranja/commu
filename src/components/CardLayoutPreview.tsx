@@ -1,7 +1,7 @@
 import type { ReactElement, ReactNode } from "react";
 
 const cardClass =
-  "flex min-h-0 min-w-0 items-center justify-center rounded-2xl border border-slate-200 bg-white p-3 text-center text-sm font-semibold text-slate-800 shadow-sm";
+  "flex min-h-0 min-w-0 items-center justify-center rounded-full border border-slate-200 bg-white p-3 text-center text-sm font-semibold text-slate-800 shadow-sm";
 
 function Card({ n }: { n: number }) {
   return <div className={cardClass}>Card {n}</div>;
@@ -79,7 +79,7 @@ function LayoutHero({ count }: { count: number }) {
   const [first, ...rest] = items;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
+    <div className="scrollbar-none flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto">
       <div className="shrink-0">
         <div className={`${cardClass} min-h-[72px]`}>Card {first} (hero)</div>
       </div>
@@ -117,7 +117,7 @@ export function CardLayoutPreview() {
           Compare three strategies for 3, 5, and 7 cards inside a phone-sized area (360×500).
         </p>
 
-        <div className="overflow-x-auto">
+        <div className="scrollbar-none overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
               <tr>

@@ -9,8 +9,10 @@ type Props = {
   bottomNav: ReactNode;
   fab: ReactNode;
   bare?: boolean;
-  /** V1 prototype: white status bar + header to match white sub-tab strip */
-  whiteTopChrome?: boolean;
+  /** Prototype B: search icon in the header before the bell */
+  globalSearch?: ReactNode;
+  /** Full-screen search overlay (e.g. Luma-style) */
+  searchOverlay?: ReactNode;
 };
 
 export function AppShell({
@@ -22,9 +24,9 @@ export function AppShell({
   bottomNav,
   fab,
   bare,
-  whiteTopChrome,
+  globalSearch,
+  searchOverlay,
 }: Props) {
-  const topChrome = whiteTopChrome ? "bg-white" : "bg-slate-100";
   const phone = (
         <div className="iphone-frame" data-device="iPhone 17 Pro">
         <div className="relative flex h-[780px] w-[360px] flex-col overflow-hidden rounded-[2rem] bg-slate-100">
@@ -32,7 +34,7 @@ export function AppShell({
             className="iphone-dynamic-island pointer-events-none absolute left-1/2 top-1.5 z-30 -translate-x-1/2"
             aria-hidden
           />
-          <div className={`relative z-10 flex min-h-[54px] shrink-0 items-center px-4 pt-2.5 pb-2 ${topChrome}`} aria-hidden>
+          <div className="relative z-10 flex min-h-[44px] shrink-0 items-center bg-slate-100 px-4 pt-1.5 pb-1" aria-hidden>
             <span className="text-[15px] font-bold leading-none text-slate-800">9:41</span>
             <span className="flex-1" />
             <div className="flex items-center gap-1.5">
@@ -40,7 +42,7 @@ export function AppShell({
               <svg viewBox="0 0 25 12" className="h-[14px] w-[25px]" fill="currentColor"><rect x="0.5" y="0.5" width="21" height="11" rx="2" ry="2" fill="none" stroke="currentColor" strokeWidth="1"/><rect x="2" y="2" width="14" height="7" rx="1" ry="1"/><path d="M22.5 4v4a2 2 0 0 0 0-4z"/></svg>
             </div>
           </div>
-          <header className={`relative z-20 flex shrink-0 items-center gap-2 px-3 pb-0.5 ${topChrome}`}>
+          <header className="relative z-20 flex shrink-0 items-center gap-2 bg-slate-100 px-3 pb-4">
             <button
               type="button"
               onClick={onAvatarClick}
@@ -55,19 +57,22 @@ export function AppShell({
               </svg>
             </button>
             <span className="flex-1" aria-hidden />
-            <button
-              type="button"
-              onClick={onNotificationsClick}
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-700"
-              aria-label="Open notifications"
-            >
-              <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
-                <path
-                  fill="currentColor"
-                  d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"
-                />
-              </svg>
-            </button>
+            <div className="flex h-9 shrink-0 items-stretch overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm">
+              {globalSearch}
+              <button
+                type="button"
+                onClick={onNotificationsClick}
+                className="flex min-w-[2.25rem] shrink-0 items-center justify-center px-2 text-slate-700 transition-colors hover:bg-slate-50 active:bg-slate-100"
+                aria-label="Open notifications"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5">
+                  <path
+                    fill="currentColor"
+                    d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.9 2 2 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2zm-2 1H8v-6c0-2.48 1.51-4.5 4-4.5s4 2.02 4 4.5v6z"
+                  />
+                </svg>
+              </button>
+            </div>
           </header>
 
           <div className="relative min-h-0 flex-1 overflow-hidden">{children}</div>
@@ -82,6 +87,7 @@ export function AppShell({
 
           {avatarMenu}
           {notificationsPanel}
+          {searchOverlay}
         </div>
         </div>
   );

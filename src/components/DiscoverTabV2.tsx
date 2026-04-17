@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { SectionDef } from "../navigation/appStructure";
 import { sectionsByTab } from "../navigation/appStructure";
 const discoverSections = sectionsByTab.discover;
 
 function SearchBar() {
   return (
-    <div className="mb-4 flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
+    <div className="mb-4 flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-2.5 shadow-sm">
       <svg viewBox="0 0 20 20" className="h-4 w-4 shrink-0 text-slate-400" fill="currentColor">
         <path
           fillRule="evenodd"
@@ -98,7 +98,7 @@ function ExpandButton({ expanded, onToggle }: { expanded: boolean; onToggle: () 
   return (
     <button
       type="button"
-      className="absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-lg bg-white/80 text-slate-600 shadow backdrop-blur-sm"
+      className="absolute top-2 right-2 z-10 flex h-7 w-7 items-center justify-center rounded-full bg-white/80 text-slate-600 shadow backdrop-blur-sm"
       onClick={(e) => {
         e.stopPropagation();
         onToggle();
@@ -156,7 +156,7 @@ function ExpandedMapOverlay({
 
 function VerticalFeed({ count = 4 }: { count?: number }) {
   return (
-    <div className="space-y-3">
+    <div className="space-y-2.5">
       {Array.from({ length: count }, (_, i) => i + 1).map((n) => (
         <div
           key={n}
@@ -175,7 +175,7 @@ function CarouselRow({ section }: { section: SectionDef }) {
       <h3 className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
         {section.label}
       </h3>
-      <div className="flex gap-3 overflow-x-auto pb-1">
+      <div className="scrollbar-none flex gap-2.5 overflow-x-auto pb-1">
         {[1, 2, 3, 4].map((n) => (
           <div
             key={n}
@@ -194,7 +194,7 @@ function CarouselRow({ section }: { section: SectionDef }) {
 type PostsTheme = "all" | "neighborhood-help" | "ngos" | "food-aid";
 
 const postsThemes: { id: PostsTheme; label: string }[] = [
-  { id: "all", label: "All" },
+  { id: "all", label: "All topics" },
   { id: "neighborhood-help", label: "Neighborhood help" },
   { id: "ngos", label: "NGOs" },
   { id: "food-aid", label: "Food aid" },
@@ -208,6 +208,87 @@ const postsChips: { id: PostsChip; label: string }[] = [
   { id: "popular-finland", label: "Popular in Finland" },
 ];
 
+/** Same pattern as V1 DiscoverTab: one dark pill + chevron, dropdown list */
+function PillDropdown<T extends string>({
+  options,
+  active,
+  onSelect,
+  listAriaLabel,
+}: {
+  options: { id: T; label: string }[];
+  active: T;
+  onSelect: (id: T) => void;
+  listAriaLabel: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleDown = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleDown);
+    return () => document.removeEventListener("mousedown", handleDown);
+  }, [open]);
+
+  return (
+    <div className="relative shrink-0" ref={menuRef}>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="listbox"
+        onClick={() => setOpen((o) => !o)}
+        className="flex items-center gap-2 rounded-full bg-slate-800 px-4 py-2 text-sm font-semibold text-white shadow-sm"
+      >
+        <span>{options.find((t) => t.id === active)?.label}</span>
+        <svg
+          viewBox="0 0 20 20"
+          className={`h-4 w-4 shrink-0 text-white/90 transition-transform ${open ? "rotate-180" : ""}`}
+          fill="currentColor"
+          aria-hidden
+        >
+          <path
+            fillRule="evenodd"
+            d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+            clipRule="evenodd"
+          />
+        </svg>
+      </button>
+      {open && (
+        <div
+          className="absolute top-full left-0 z-20 mt-1 w-56 rounded-full border border-slate-200 bg-white py-1 shadow-lg"
+          role="listbox"
+          aria-label={listAriaLabel}
+        >
+          {options.map((t) => {
+            const isActive = t.id === active;
+            return (
+              <button
+                key={t.id}
+                type="button"
+                role="option"
+                aria-selected={isActive}
+                onClick={() => {
+                  onSelect(t.id);
+                  setOpen(false);
+                }}
+                className={`flex w-full px-4 py-2.5 text-left text-sm font-semibold ${
+                  isActive ? "bg-slate-100 text-slate-900" : "text-slate-700 hover:bg-slate-50"
+                }`}
+              >
+                {t.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function FilterChips<T extends string>({
   options,
   active,
@@ -220,7 +301,7 @@ function FilterChips<T extends string>({
   return (
     <div className="mb-3 flex min-w-0 shrink-0 justify-center">
       <div
-        className="inline-flex max-w-full min-w-0 flex-nowrap items-stretch gap-0.5 overflow-x-auto overscroll-x-contain rounded-full bg-slate-200 p-1 [scrollbar-width:thin]"
+        className="scrollbar-none inline-flex max-w-full min-w-0 flex-nowrap items-stretch gap-0.5 overflow-x-auto overscroll-x-contain rounded-full bg-slate-200 p-1"
         role="tablist"
         aria-label="Filters"
       >
@@ -270,9 +351,9 @@ export function DiscoverTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: D
 
   return (
     <div className="flex h-full flex-col">
-      <div className="shrink-0 px-3 pt-2 pb-1">
+      <div className="shrink-0 px-3 pt-0 pb-0">
         <div
-          className="flex gap-3 overflow-x-auto overscroll-x-contain pb-2 [scrollbar-width:thin]"
+          className="scrollbar-none -mx-3 flex gap-2.5 overflow-x-auto overscroll-x-contain px-3 pt-1 pb-2"
           role="tablist"
           aria-label="Discover sections"
         >
@@ -289,7 +370,7 @@ export function DiscoverTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: D
                 setSelectedPin(null);
                 setMapExpanded(false);
               }}
-              className={`shrink-0 min-w-[7.5rem] rounded-2xl border px-4 py-3 text-center text-sm font-semibold transition-colors ${
+              className={`shrink-0 min-w-[7.5rem] rounded-full border px-4 py-3 text-center text-sm font-semibold transition-colors ${
                 i === activeIdx
                   ? "border-transparent bg-slate-800 text-white shadow-md"
                   : "border-slate-200 bg-white text-slate-600 shadow-sm hover:border-slate-300 hover:bg-slate-50"
@@ -304,8 +385,8 @@ export function DiscoverTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: D
       <div
         className={
           isPosts && postsChip === "nearby"
-            ? "relative flex min-h-0 flex-1 flex-col overflow-hidden px-3 py-3"
-            : "relative min-h-0 flex-1 overflow-y-auto px-3 py-3"
+            ? "relative flex min-h-0 flex-1 flex-col overflow-hidden px-3 pt-2.5 pb-3"
+            : "scrollbar-none relative min-h-0 flex-1 overflow-y-auto px-3 pt-2.5 pb-3"
         }
       >
         {hasSearch && (
@@ -316,13 +397,23 @@ export function DiscoverTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: D
 
         {isPosts && (
           <>
-            <div className="shrink-0">
-              <FilterChips options={postsThemes} active={postsTheme} onSelect={setPostsTheme} />
-              <FilterChips options={postsChips} active={postsChip} onSelect={setPostsChip} />
+            <div className="mb-3 flex shrink-0 flex-wrap items-start gap-2">
+              <PillDropdown
+                options={postsThemes}
+                active={postsTheme}
+                onSelect={setPostsTheme}
+                listAriaLabel="Topic filter"
+              />
+              <PillDropdown
+                options={postsChips}
+                active={postsChip}
+                onSelect={setPostsChip}
+                listAriaLabel="Feed filter"
+              />
             </div>
 
             {postsChip === "nearby" && (
-              <div className="flex min-h-0 flex-1 flex-col gap-3">
+              <div className="flex min-h-0 flex-1 flex-col gap-2.5">
                 <div
                   className="relative min-h-0 flex-1 overflow-hidden rounded-2xl border border-slate-200 shadow-sm"
                   onClick={() => setSelectedPin(null)}
@@ -369,7 +460,7 @@ export function DiscoverTabV2({ activeIdx: controlledIdx, onActiveIdxChange }: D
         )}
 
         {!isPosts && !isStories && (
-          <div className="space-y-3">
+          <div className="space-y-2.5">
             {[1, 2, 3].map((n) => (
               <div
                 key={n}

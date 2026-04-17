@@ -9,7 +9,7 @@ type Props = {
 };
 
 const rowClassName =
-  "flex w-full items-center justify-between gap-2 rounded-2xl border border-slate-200 bg-white px-3 py-3 text-left text-sm font-semibold text-slate-800 shadow-sm";
+  "flex w-full items-center justify-between gap-2 rounded-full border border-slate-200 bg-white px-3 py-3 text-left text-sm font-semibold text-slate-800 shadow-sm";
 
 function toggleSectionId(ids: string[], id: string): string[] {
   return ids.includes(id) ? ids.filter((x) => x !== id) : [...ids, id];
@@ -70,7 +70,7 @@ export function TabHub({
                   key={section.id}
                   type="button"
                   onClick={() => onSelectSection(section.id)}
-                  className="flex min-h-0 min-w-0 items-center justify-center rounded-2xl border border-slate-200 bg-white p-3 text-center text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:bg-slate-50"
+                  className="flex min-h-0 min-w-0 items-center justify-center rounded-full border border-slate-200 bg-white p-3 text-center text-sm font-semibold text-slate-800 shadow-sm transition-colors hover:bg-slate-50"
                 >
                   {section.label}
                 </button>
@@ -93,7 +93,7 @@ export function TabHub({
                   type="button"
                   aria-pressed={selected}
                   onClick={() => setSelected(toggleSectionId(myTownSelectedSectionIds, section.id))}
-                  className={`flex min-h-0 min-w-0 items-center justify-center rounded-2xl border p-3 text-center text-sm font-semibold shadow-sm transition-colors ${
+                  className={`flex min-h-0 min-w-0 items-center justify-center rounded-full border p-3 text-center text-sm font-semibold shadow-sm transition-colors ${
                     selected
                       ? "border-slate-800 bg-slate-800 text-white hover:bg-slate-700"
                       : "border border-slate-200 bg-white text-slate-800 hover:bg-slate-50"
@@ -111,7 +111,7 @@ export function TabHub({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="flex-1 overflow-y-auto px-3 py-3">
+      <div className="scrollbar-none flex-1 overflow-y-auto px-3 py-3">
         {sections.length > 0 ? (
           <ul className="grid gap-2">
             {sections.map((section) => (
